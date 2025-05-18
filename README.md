@@ -1,66 +1,105 @@
-## Foundry
+---
 
-**Foundry is a blazing fast, portable and modular toolkit for Ethereum application development written in Rust.**
+# 🪙 TokenSwap DEX Integration
 
-Foundry consists of:
+A smart contract that enables token swaps via the Uniswap V3 protocol. This project is designed for developers building on-chain DeFi solutions using Solidity and Foundry. It includes both mainnet-ready contract logic and a comprehensive local testing setup using mocks.
 
--   **Forge**: Ethereum testing framework (like Truffle, Hardhat and DappTools).
--   **Cast**: Swiss army knife for interacting with EVM smart contracts, sending transactions and getting chain data.
--   **Anvil**: Local Ethereum node, akin to Ganache, Hardhat Network.
--   **Chisel**: Fast, utilitarian, and verbose solidity REPL.
+---
 
-## Documentation
+## 📌 Features
 
-https://book.getfoundry.sh/
+* ✅ **Single-token swap (Exact Input)**: Swap a specific amount of token A for token B.
+* ✅ **Single-token swap (Exact Output)**: Swap up to a maximum amount of token A to receive an exact amount of token B.
+* 🔒 **Slippage Protection**: Set minimum amount out or maximum amount in.
+* 🔁 **Mocked Router for Testing**: Includes `MockSwapRouter` to simulate Uniswap V3 behavior in local tests.
+* ⚡️ **Written in Solidity `^0.8.0`** with Foundry for testing.
 
-## Usage
+---
 
-### Build
+## 🚀 Live Deployment
 
-```shell
-$ forge build
+* **Network**: Sepolia Testnet
+* **TokenSwap Contract Address**: `0x6a5bA2eB584309A03abbF94e505D868AFE6dD26d`
+* **Router Used**: Uniswap V3 SwapRouter (or mocked locally for test)
+* **Tokens Used in Test Swaps**:
+
+  * LINK: `0x779877A7B0D9E8603169DdbD7836e478b4624789`
+  * USDC: `0x1c7D4B196Cb0C7B01d743Fbc6116a902379C7238`
+
+---
+
+## 🧱 Contract Overview
+
+### `TokenSwap.sol`
+
+Main contract to perform token swaps using Uniswap V3.
+
+```solidity
+function swapExactInputSingle(address tokenIn, address tokenOut, uint256 amountIn, uint256 amountOutMin) external returns (uint256);
+function swapExactOutputSingleToken(address tokenIn, address tokenOut, uint256 amountOut, uint256 amountInMaximum) external returns (uint256);
 ```
 
-### Test
+* Approves the `ISwapRouter` to spend user tokens.
+* Encodes parameters for Uniswap's `exactInputSingle` and `exactOutputSingle` functions.
+* Executes the swap and optionally refunds unused tokens.
 
-```shell
-$ forge test
+---
+
+## 🧪 Testing
+
+### Prerequisites
+
+* [Foundry](https://book.getfoundry.sh/) installed
+* RPC URL and private key set via `.env`
+
+### Run Tests
+
+```bash
+forge test -vv
 ```
 
-### Format
+### Mocks
 
-```shell
-$ forge fmt
+* ✅ `MockSwapRouter.sol`: Simulates `ISwapRouter` behavior.
+* Implements dummy return values for both `exactInputSingle()` and `exactOutputSingle()`.
+
+---
+
+## 🔄 Mock Example
+
+```solidity
+function exactInputSingle(...) external override returns (uint256) {
+    return 1e18; // Mocks a successful swap returning 1 ETH-equivalent
+}
 ```
 
-### Gas Snapshots
+Ensure mock is correctly set in your test setup:
 
-```shell
-$ forge snapshot
+```solidity
+swapRouter = new MockSwapRouter();
+tokenSwap = new TokenSwap(address(swapRouter));
 ```
 
-### Anvil
+---
 
-```shell
-$ anvil
-```
+## 🧰 Tools & Libraries
 
-### Deploy
+* 🧪 **Foundry** – for fast and efficient testing
+* 🔁 **Uniswap V3** – interface and logic
+* 🔐 **OpenZeppelin** – secure ERC-20 transfers
+* 🧪 **Mocks** – to simulate external Uniswap behavior in a safe local environment
 
-```shell
-$ forge script script/Counter.s.sol:CounterScript --rpc-url <your_rpc_url> --private-key <your_private_key>
-```
+---
 
-### Cast
+## 📄 License
 
-```shell
-$ cast <subcommand>
-```
+[MIT](./LICENSE)
 
-### Help
+---
 
-```shell
-$ forge --help
-$ anvil --help
-$ cast --help
-```
+## 🤝 Contributions
+
+Contributions, feedback, and suggestions are welcome! Fork this repo and open a PR or file an issue for improvement.
+
+---
+
